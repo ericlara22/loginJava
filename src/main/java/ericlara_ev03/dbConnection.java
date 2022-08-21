@@ -6,24 +6,8 @@ public class dbConnection {
     private String host, port, user, db, pass;
     private Connection connector;
     
-    
-    dbConnection() throws SQLException{
-        host= "localhost";
-        port = "3306";
-        user="root";
-        db = "taller3"; 
-        pass="";
-        
-        connector = DriverManager.getConnection(
-        "jdbc:mariadb://"+host+":"+port+"/"+db,user,pass
-        );
-        System.out.println("Connection OK!");
-        
-        
-        
-    }
-    
-    public static Connection getConnection() throws SQLException{
+       
+    public Connection getConnection() throws SQLException{
         String host, port, user, db, pass;
         host= "localhost";
         port = "3306";
