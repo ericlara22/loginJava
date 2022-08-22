@@ -28,6 +28,9 @@ public class LoginController {
     private Button buttonLogin;
     
     
+    
+    
+    
     public void showAlert(String titulo, String msg){
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setHeaderText(null);
@@ -36,7 +39,7 @@ public class LoginController {
                 alert.showAndWait();
     }
     
- 
+
   
 
     @FXML
@@ -72,15 +75,20 @@ public class LoginController {
                         admin = true;
                     } 
                     
-                    /*
-                    String loggedRut, loggedNombre, loggedApellido;
-                    
-                    loggedRut = resultSet.getString("rut");
-                    loggedNombre = resultSet.getString("nombre");
-                    loggedApellido = resultSet.getString("apellido"); 
-                    */
                     
                     
+                    
+                    String loggedRut = resultSet.getString("rut");
+                    String loggedNombre = resultSet.getString("nombre");
+                    String loggedApellido = resultSet.getString("apellido"); 
+                    
+                    CurrentUser current = new CurrentUser();
+                    current.setRut(loggedRut);
+                    current.setNombre(loggedNombre);
+                    current.setApellido(loggedApellido);                    
+                    current.setAdmin(admin);
+                    
+                    App.setCurrentUser(current);
                     
                     App.setRoot("users");
                     

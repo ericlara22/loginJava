@@ -30,11 +30,14 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 
 public class UsersController implements Initializable{
     
     private Object[] users;
     private String[] profiles = {"Administrador", "Usuario"};
+    public CurrentUser CurrentUser;
+    public boolean editPane = false;
 
     @FXML
     private Button buttonCreate;
@@ -66,12 +69,27 @@ public class UsersController implements Initializable{
     @FXML
     public TableColumn <UserModel, String> columnApellido;
     @FXML
+    private TableColumn<UserModel, String> columnPerfil;
+    
     public ObservableList<UserModel> userList;
     
     private int index=-1;
+    @FXML
+    private Button buttonToggleEdit;
+    @FXML
+    private Pane paneEdit;
+    @FXML
+    private Label labelWelcome;
+    @FXML
+    private Label labelEdit;
+    @FXML
+    private Button buttonAdd;
+    @FXML
+    private Button buttonCancel;
+   
 
     
-
+    
     
     /*Metodo para mostrar alertas que toma un titulo y un mensaje*/
     public void showAlert(String titulo, String msg){
@@ -133,7 +151,6 @@ public class UsersController implements Initializable{
     }
     
     
-        @FXML
         public ObservableList<UserModel> getUsers() throws SQLException {
             /*Instanciar la clase dbConnection y llamar al metodo getConnection que hace la conexión con la BD*/
             dbConnection bd = new dbConnection();
@@ -170,6 +187,7 @@ public class UsersController implements Initializable{
         
    @FXML
         private void getSelected() throws SQLException {
+            
             dbConnection bd = new dbConnection();
             Connection connection = bd.getConnection();
             
@@ -179,7 +197,14 @@ public class UsersController implements Initializable{
                 return;
             }
             
-            String clickedRut = columnRut.getCellData(index).toString();
+            String clickedRut = columnRut.getCellData(index);
+            
+            /*Estado parcialmente inical*/
+            buttonCreate.setVisible(false);
+            buttonAdd.setVisible(true);
+            labelEdit.setText("Datos de Usuario");
+            buttonEdit.setVisible(false);
+            buttonCancel.setVisible(false);
             
             
             try {
@@ -195,7 +220,29 @@ public class UsersController implements Initializable{
                 txtApellido.setText(resultSet.getString("apellido"));
                 txtEdad.setText(String.valueOf(resultSet.getInt("edad")));                
                 cbPerfil.setValue(resultSet.getString("perfil"));
-
+                
+                /*Validacion de perfiles de usuarios -BOTON BORRAR PARA ADMINS Y NO MISMO USER-*/
+                buttonDelete.setVisible(true);
+                if (txtRut.getText().equals(App.getCurrentUser().rut) || !App.getCurrentUser().admin) {
+                    buttonDelete.setVisible(false);
+                } else {                   
+                    
+                    buttonDelete.setVisible(true);
+                }
+                
+                /*Validacion boton editar para perfiles USUARIO -NO PUEDEN EDITAR A LOS ADMINS-*/
+                buttonToggleEdit.setVisible(true);
+                if (!App.getCurrentUser().admin){
+                    if("Administrador".equals(cbPerfil.getValue())){
+                        buttonToggleEdit.setVisible(false);
+                        
+                    } else {
+                        buttonToggleEdit.setVisible(true);
+                        
+                    }
+                }
+                
+                
     
             } catch (Exception e) {
                 showAlert("Error", e.getMessage());
@@ -214,6 +261,8 @@ public class UsersController implements Initializable{
    
             String rut, nombre, apellido, contrasena, perfil;
             int edad;
+            
+
             
             /*Capturando datos de los text field*/
             
@@ -299,13 +348,15 @@ public class UsersController implements Initializable{
     @FXML
         private void deleteUser() throws SQLException {
             /*Primero se valida que hayan usuarios seleccionados*/
-            /*-PRENDIENTE VALIDAD QUE SEA ADMIN Y QUE NO SE ELIMINE A SI MISMO--*/
+                       
+            
             if (txtRut.getText() != "") {
                 dbConnection bd = new dbConnection();
                 Connection connection = bd.getConnection();
 
                 getSelected();
-
+                
+                
                 Optional<ButtonType> result = showConfirmation("Borrar Usuario", "Esta seguro que desea borrar el usuario?");
 
                 if (result.get() == ButtonType.OK) {
@@ -318,14 +369,62 @@ public class UsersController implements Initializable{
             } else {
                 showAlert("Error", "Ningún usuario seleccionado");
             }         
-                            
-            
+
+
             init();
-            
-        
         
         
         }
+        
+        
+        
+        
+    @FXML
+    private void turnOnEdition() {
+        
+        
+        
+        paneEdit.setDisable(false);
+        buttonToggleEdit.setVisible(false);
+        buttonEdit.setVisible(true);
+        buttonCancel.setVisible(true);
+        labelEdit.setVisible(true);
+        labelEdit.setText("Editar usuario");
+        buttonDelete.setVisible(false);
+        buttonAdd.setVisible(false);
+        
+    }
+    
+    
+    private void turnOffEdition() {        
+        
+        paneEdit.setDisable(true);
+        buttonToggleEdit.setVisible(true);
+        buttonEdit.setVisible(false);
+        labelEdit.setText("Datos de Usuario");
+        
+    }
+    
+     @FXML
+    private void createPanel(ActionEvent event) throws SQLException {
+        
+        init();
+        paneEdit.setDisable(false);
+        labelEdit.setText("Crear nuevo");
+        labelEdit.setVisible(true);
+        buttonCreate.setVisible(true);
+        buttonCancel.setVisible(true);
+        buttonAdd.setVisible(false);
+        buttonDelete.setVisible(false);
+        buttonToggleEdit.setVisible(false);
+        
+    }
+
+    @FXML
+    private void cancelActions(ActionEvent event) throws SQLException {
+        init();
+    }
+        
     
     public void init() throws SQLException{
         getUsers();
@@ -335,12 +434,19 @@ public class UsersController implements Initializable{
         txtApellido.setText("");
         txtEdad.setText("");             
         cbPerfil.setValue("");
-        
+        buttonCreate.setVisible(false);        
+        buttonAdd.setVisible(true);        
+        buttonEdit.setVisible(false);
+        labelEdit.setText("");
+        turnOffEdition();
+        buttonCancel.setVisible(false);
+        labelWelcome.setText("Hola "+App.getCurrentUser().nombre+"!");
+        buttonToggleEdit.setVisible(false);
+        buttonDelete.setVisible(false);
     }
 
     
     @Override
-    @FXML
     public void initialize(URL url, ResourceBundle rb) {
         try {
             getUsers();
@@ -348,17 +454,27 @@ public class UsersController implements Initializable{
             showAlert("Error", "No hay usuarios");
         }
   
-        
-        
+               
         cbPerfil.getItems().addAll(profiles);
         
         columnRut.setCellValueFactory(new PropertyValueFactory<UserModel, String>("rut"));
         columnNombre.setCellValueFactory(new PropertyValueFactory<UserModel, String>("nombre"));
         columnApellido.setCellValueFactory(new PropertyValueFactory<UserModel, String>("apellido"));
+        columnPerfil.setCellValueFactory(new PropertyValueFactory<UserModel, String>("perfil"));
         
         tableUsers.setItems(userList);
-        
-        
+        buttonToggleEdit.setVisible(false);
+        if (!App.getCurrentUser().admin){
+             buttonDelete.setVisible(false);
+        }        
+        try {
+            init();
+        } catch (SQLException ex) {
+            
         }
-    
+        }
+
+   
+
+        
 }

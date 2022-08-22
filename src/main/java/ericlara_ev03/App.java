@@ -11,7 +11,20 @@ import java.sql.SQLException;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 
+
+
 public class App extends Application {
+    
+    public static CurrentUser currentUser;
+    
+    public static void setCurrentUser (CurrentUser current){        
+        App.currentUser = current;
+    }
+    
+    public static CurrentUser getCurrentUser (){
+        return currentUser;        
+    }
+    
     
     private static Scene scene;
 
