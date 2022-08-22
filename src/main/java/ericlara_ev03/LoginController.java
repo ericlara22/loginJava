@@ -90,7 +90,14 @@ public class LoginController {
                     
                     App.setCurrentUser(current);
                     
-                    App.setRoot("users");
+                    
+                    Parent root = FXMLLoader.load(getClass().getResource("users.fxml"));
+                    Stage stage = (Stage)buttonLogin.getScene().getWindow();
+                    stage.setScene(new Scene(root));
+                    stage.setTitle("Administración de Usuarios");
+                    
+                    
+                    //App.setRoot("users");
                     
                     
                    

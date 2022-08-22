@@ -111,44 +111,6 @@ public class UsersController implements Initializable{
     }
     
 
-
-    
-    public Boolean ValidarRut(String rut){
-    int op=2, sum=0;
-       
-    String rutPart = rut.substring(0, rut.length()-2);
-    String verificador = rut.substring(rut.length()-1,rut.length());
-
-       
-        for (int i = rutPart.length()-1; i >= 0; i--) {
-            sum += Integer.parseInt(rutPart.charAt(i)+"")*op;
-            op++;
-            if (op > 7) {
-                op = 2;
-            }
-
-        }
-       
-    int resto = 11-sum%11;
-    String digitoFinal;
-        if (resto == 10) {
-            digitoFinal="K";
-        } else {
-            if (resto == 11) {
-                digitoFinal="0";
-            } else {
-                digitoFinal=resto+"";
-            }
-    }
-           
-        if (digitoFinal.equals(verificador)) {
-            return true;
-
-        } else{
-            return false;
-        }
-   
-    }
     
     
         public ObservableList<UserModel> getUsers() throws SQLException {
@@ -290,58 +252,114 @@ public class UsersController implements Initializable{
                 showAlert("Error", "Faltan datos por completar");
             } else {
                 
-                try {
-                    /*Conexion a la bd*/
-                    PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO usuarios(rut, nombre, apellido, edad, contrasena, perfil) VALUES (?,?,?,?,?,?)");
-                    preparedStatement.setString(1, rut);
-                    preparedStatement.setString(2, nombre);
-                    preparedStatement.setString(3, apellido);
-                    preparedStatement.setInt(4, edad);
-                    preparedStatement.setString(5, contrasena);
-                    preparedStatement.setString(6, perfil);
-                    
-                    preparedStatement.executeUpdate();
+                if (ValidarRut(rut)) {
+                    try {
+                        /*Conexion a la bd*/
+                        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO usuarios(rut, nombre, apellido, edad, contrasena, perfil) VALUES (?,?,?,?,?,?)");
+                        preparedStatement.setString(1, rut);
+                        preparedStatement.setString(2, nombre);
+                        preparedStatement.setString(3, apellido);
+                        preparedStatement.setInt(4, edad);
+                        preparedStatement.setString(5, contrasena);
+                        preparedStatement.setString(6, perfil);
 
-                    showAlert("Mensaje", "Usuario creado exitosamente");
+                        preparedStatement.executeUpdate();
+
+                        showAlert("Mensaje", "Usuario creado exitosamente");
+                        /*ACTUALIZA TABLA*/
+                        init();
                     
-                } catch (Exception e) {
-                    showAlert("Mensaje", "Error en la base de datos");
+                    } catch (Exception e) {
+                        showAlert("Mensaje", "Error en la base de datos");
+                        init();
+                    }
+                    
+                } else {
+                    showAlert("Error", "Rut incorrecto");
+                }              
+            }
+            
+        }
+        
+        
+        public Boolean ValidarRut(String rut){
+            int op=2, sum=0;
+
+            String rutPart = rut.substring(0, rut.length()-2);
+            String verificador = rut.substring(rut.length()-1,rut.length());
+
+
+            for (int i = rutPart.length()-1; i >= 0; i--) {
+                sum += Integer.parseInt(rutPart.charAt(i)+"")*op;
+                op++;
+                if (op > 7) {
+                    op = 2;
+                }
+
+            }
+
+            int resto = 11-sum%11;
+            String digitoFinal;
+            if (resto == 10) {
+                digitoFinal="K";
+            } else {
+                if (resto == 11) {
+                    digitoFinal="0";
+                } else {
+                    digitoFinal=resto+"";
                 }
             }
-            /*ACTUALIZA TABLA*/
-            init();
+
+            if (digitoFinal.equals(verificador)) {
+                return true;
+
+            } else{
+                return false;
+            }
+   
         }
+        
+        
 
     @FXML
         private void updateUser() throws SQLException {
             if (txtRut.getText() != "") {
             dbConnection bd = new dbConnection();
             Connection connection = bd.getConnection();
+            
+                if (ValidarRut(txtRut.getText())) {
+                    Optional<ButtonType> result = showConfirmation("Editar Usuario", "Esta seguro que desea editar el usuario?");
 
-            Optional<ButtonType> result = showConfirmation("Editar Usuario", "Esta seguro que desea editar el usuario?");
+                    if (result.get() == ButtonType.OK) {
+                        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE usuarios SET rut = ?, nombre = ?, apellido = ?, edad = ?, contrasena = ?, perfil = ? WHERE rut = ?");
+                        preparedStatement.setString(1, txtRut.getText());
+                        preparedStatement.setString(2, txtNombre.getText());
+                        preparedStatement.setString(3, txtApellido.getText());
+                        preparedStatement.setInt(4, Integer.parseInt(txtEdad.getText() ));
+                        preparedStatement.setString(5, "123456");
+                        preparedStatement.setString(6, cbPerfil.getSelectionModel().getSelectedItem());
+                        preparedStatement.setString(7, txtRut.getText());                  
 
-                if (result.get() == ButtonType.OK) {
-                    PreparedStatement preparedStatement = connection.prepareStatement("UPDATE usuarios SET rut = ?, nombre = ?, apellido = ?, edad = ?, contrasena = ?, perfil = ? WHERE rut = ?");
-                    preparedStatement.setString(1, txtRut.getText());
-                    preparedStatement.setString(2, txtNombre.getText());
-                    preparedStatement.setString(3, txtApellido.getText());
-                    preparedStatement.setInt(4, Integer.parseInt(txtEdad.getText() ));
-                    preparedStatement.setString(5, "123456");
-                    preparedStatement.setString(6, cbPerfil.getSelectionModel().getSelectedItem());
-                    preparedStatement.setString(7, txtRut.getText());                  
-                                                           
+
+                        preparedStatement.executeUpdate();
+                        showAlert("Confirmación", "Usuario actualizado");
+                        init();
+                    } else {
+
+                    }   
                     
-                    preparedStatement.executeUpdate();
-                    showAlert("Confirmación", "Usuario actualizado");
-                } else {
-
-                }   
+                    
+                } else{
+                    showAlert("Error", "Rut invalido");
+                }
+            
+            
             } else {
                 showAlert("Error", "Ningún usuario seleccionado");
             }         
                             
             
-            init();
+            
         
         }
 

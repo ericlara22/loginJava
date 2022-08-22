@@ -10,11 +10,11 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<VBox pickOnBounds="false" prefHeight="475.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ericlara_ev03.LoginController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="false" prefHeight="500.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ericlara_ev03.LoginController">
    <children>
-      <AnchorPane prefHeight="475.0" prefWidth="475.0">
+      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="400.0">
          <children>
-            <Pane layoutX="180.0" layoutY="86.0" prefHeight="306.0" prefWidth="255.0">
+            <Pane layoutX="76.0" layoutY="87.0" prefHeight="306.0" prefWidth="255.0">
                <children>
                   <Label layoutX="71.0" layoutY="2.0" text="LOGIN">
                      <font>
@@ -33,14 +33,14 @@
                      </font>
                   </Label>
                   <PasswordField fx:id="txtPassword" layoutY="214.0" prefHeight="25.0" prefWidth="202.0" promptText="Ingrese su contraseña" />
-                  <Button fx:id="buttonLogin" layoutY="279.0" mnemonicParsing="false" onAction="#login" prefHeight="27.0" prefWidth="70.0" text="Login">
+                  <Button fx:id="buttonLogin" layoutY="279.0" mnemonicParsing="false" onAction="#login" prefHeight="27.0" prefWidth="70.0" styleClass="btn" stylesheets="@../../../../../Desktop/app.css" text="Login">
                      <font>
                         <Font name="Constantia" size="13.0" />
                      </font>
                   </Button>
                </children>
             </Pane>
-            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#1fbcff94" height="475.0" layoutX="530.0" layoutY="1.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="164.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#1fbcff94" height="506.0" layoutX="316.0" layoutY="-4.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="84.0" />
          </children>
       </AnchorPane>
    </children>
